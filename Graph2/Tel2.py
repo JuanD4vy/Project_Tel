@@ -1,5 +1,6 @@
 #  Se importan todas las librerías necesarias
 import sys    
+import csv
 import serial
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
@@ -114,7 +115,10 @@ class SerialPlot(QWidget):   ## Se declara una clase para el manejo del Widget
         self.curve6.setData(self.x_data, self.y_data_6)
         # Actualizar las líneas de la gráfica con los nuevos datos -> (Tiempo, Altura)
         self.curve7.setData(self.x_data, self.y_data_7)
-
+        # Guardar los nuevos datos en el archivo CSV
+        with open('datos.csv', 'a', newline='') as archivo_csv:
+            escritor_csv = csv.writer(archivo_csv)
+            escritor_csv.writerow([values[0], values[1], values[2], values[3], values[4], values[5], values[6]])
 
     def resizeEvent1(self, event):
         #Actualizar el tamaño del gráfico al cambiar el tamaño de la ventana
