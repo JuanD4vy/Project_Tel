@@ -107,6 +107,26 @@ class SerialPlot(QWidget):   ## Se declara una clase para el manejo del Widget
         layout_main.addLayout(layout_matrix)
         self.setLayout(layout_main)
         
+        self.pos_0_0.setText("Universidad Militar Nueva Granada" + " \nPrograma de ingeniería en Telecomunicaciones")
+        self.pos_0_1.setText("Proyecto de telemetría"+ " Cohete: RocketDelta")
+        self.pos_2_1.setText("Temperatura: "+"\nVelocidad: "+ str(self.y_data_1[-1]))
+        self.pos_2_2.setText("Altura: ")
+        self.pos_0_0.setStyleSheet("font-size: 20px; font-weight: bold; font-family: Trebuchet MS;")
+        self.pos_2_0.setStyleSheet("font-size: 20px; font-weight: normal; font-family: Trebuchet MS;")
+        self.pos_0_1.setStyleSheet("font-size: 20px; font-weight: normal; font-family: Trebuchet MS;")
+        self.pos_2_1.setStyleSheet("font-size: 20px; font-weight: normal; font-family: Trebuchet MS;")
+        self.pos_0_2.setStyleSheet("font-size: 20px; font-weight: normal; font-family: Trebuchet MS;")
+        self.pos_2_2.setStyleSheet("font-size: 20px; font-weight: normal; font-family: Trebuchet MS;")
+        
+        self.pos_0_0.setGeometry(50, 50, 100, 200)
+        self.pos_2_0.setGeometry(50, 50, 100, 200)
+        
+        self.pos_0_1.setGeometry(50, 300, 100, 200)
+        self.pos_2_1.setGeometry(50, 300, 100, 200)
+        
+        self.pos_0_2.setGeometry(50, 550, 100, 200)
+        self.pos_2_2.setGeometry(50, 550, 100, 200)
+        
         # Configuración del temporizador para actualizar los datos
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_data)
@@ -154,12 +174,12 @@ class SerialPlot(QWidget):   ## Se declara una clase para el manejo del Widget
 
         # Guardar los nuevos datos en el archivo CSV
         if not self.csv_header_written:
-            with open('datos5.csv', 'w', newline='') as archivo_csv:
+            with open('datos6.csv', 'w', newline='') as archivo_csv:
                 escritor_csv = csv.writer(archivo_csv)
                 escritor_csv.writerow(['t (s)', 'AceX', 'AceY', 'AceZ', 'GirX', 'GirY', 'GirZ', 'Altura'])
             self.csv_header_written = True
 
-        with open('datos5.csv', 'a', newline='') as archivo_csv:
+        with open('datos6.csv', 'a', newline='') as archivo_csv:
             escritor_csv = csv.writer(archivo_csv)
             escritor_csv.writerow([self.x_data[-1], values[0], values[1], values[2], values[3], values[4], values[5], values[6]])
                 
@@ -170,27 +190,7 @@ class SerialPlot(QWidget):   ## Se declara una clase para el manejo del Widget
         time_str = now.strftime("%H:%M:%S")
 
         # Actualizar las etiquetas de fecha y hora
-        self.pos_0_0.setText("Universidad Militar Nueva Granada" + " \nPrograma de ingeniería en Telecomunicaciones")
-        self.pos_0_1.setText("Proyecto de telemetría"+ " Cohete: RocketDelta")
         self.pos_2_0.setText("Fecha: " + date_str +" Hora: " + time_str)
-        self.pos_2_1.setText("Temperatura: "+"\nVelocidad: "+ str(self.y_data_1[-1]))
-        self.pos_2_2.setText("Altura: ")
-        
-        self.pos_0_0.setStyleSheet("font-size: 20px; font-weight: bold; font-family: Trebuchet MS;")
-        self.pos_2_0.setStyleSheet("font-size: 20px; font-weight: normal; font-family: Trebuchet MS;")
-        self.pos_0_1.setStyleSheet("font-size: 20px; font-weight: normal; font-family: Trebuchet MS;")
-        self.pos_2_1.setStyleSheet("font-size: 20px; font-weight: normal; font-family: Trebuchet MS;")
-        self.pos_0_2.setStyleSheet("font-size: 20px; font-weight: normal; font-family: Trebuchet MS;")
-        self.pos_2_2.setStyleSheet("font-size: 20px; font-weight: normal; font-family: Trebuchet MS;")
-        
-        self.pos_0_0.setGeometry(50, 50, 100, 200)
-        self.pos_2_0.setGeometry(50, 50, 100, 200)
-        
-        self.pos_0_1.setGeometry(50, 300, 100, 200)
-        self.pos_2_1.setGeometry(50, 300, 100, 200)
-        
-        self.pos_0_2.setGeometry(50, 550, 100, 200)
-        self.pos_2_2.setGeometry(50, 550, 100, 200)
         
 if __name__ == '__main__':
     app = QApplication(sys.argv)
