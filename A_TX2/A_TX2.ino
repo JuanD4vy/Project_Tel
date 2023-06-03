@@ -32,7 +32,11 @@ void setup()
   radio.openWritingPipe(address);
   radio.setChannel(110);
   radio.setDataRate(RF24_250KBPS);
-  radio.setPALevel(RF24_PA_LOW);
+  radio.setPALevel(RF24_PA_MAX);
+  pinMode(7, OUTPUT); // establecer el pin del LED como salida
+  digitalWrite(7, HIGH); // encender el 
+  pinMode(6, OUTPUT); // establecer el pin del LED como salida
+  digitalWrite(6, HIGH); // encender el LED*/
 
   if (!bmp.begin()){
     Serial.println("BMP280 no encontrado !");

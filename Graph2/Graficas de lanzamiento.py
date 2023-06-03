@@ -9,6 +9,8 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import numpy as np
 import pyqtgraph as pg
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QPushButton
 
 class SerialPlot(QWidget):   ## Se declara una clase para el manejo del Widget
 
@@ -16,9 +18,10 @@ class SerialPlot(QWidget):   ## Se declara una clase para el manejo del Widget
         super(SerialPlot, self).__init__(parent)
 
         # Configuración de la ventana principal 
-        self.setWindowTitle("Proyecto de telemetría")
+        self.setWindowTitle("Lanzamiento - Rocket DELTA")
         self.setWindowState(Qt.WindowMaximized)    ### Utilizar la pantalla completa
         self.setGeometry(0, 0, 800, 600)
+        image = QPixmap("LOGO_UMNG.png")
 
         # Configuración del gráfico de la aceleración 
         self.graphWidget = pg.PlotWidget(self)
@@ -26,9 +29,10 @@ class SerialPlot(QWidget):   ## Se declara una clase para el manejo del Widget
         self.graphWidget.setBackground('black')
         self.graphWidget.showGrid(x=True, y=True)
         self.graphWidget.setLabel('left', '<span style="color: white; font-size: 18px;">Magnitud</span>')
-        self.graphWidget.setLabel('bottom', '<span style="color: white; font-size: 18px;">Tiempo</span>')
+        self.graphWidget.setLabel('bottom', '<span style="color: white; font-size: 18px;">Tiempo (s)</span>')
         self.graphWidget.setLabel('top', '<span style="color: white; font-size: 18px;">Aceleración</span>')
-        #self.graphWidget.setXRange(0, 30)
+        self.graphWidget.getAxis('left').setStyle(tickFont=QFont('Trebuchet MS', 12))
+        self.graphWidget.getAxis('bottom').setStyle(tickFont=QFont('Trebuchet MS', 12))
         
          # Configuración del gráfico del giroscopio 
         self.graphWidget2 = pg.PlotWidget(self)
@@ -36,29 +40,29 @@ class SerialPlot(QWidget):   ## Se declara una clase para el manejo del Widget
         self.graphWidget2.setBackground('black')
         self.graphWidget2.showGrid(x=True, y=True)
         self.graphWidget2.setLabel('left', '<span style="color: white; font-size: 18px;">Magnitud</span>')
-        self.graphWidget2.setLabel('bottom', '<span style="color: white; font-size: 18px;">Tiempo</span>')
+        self.graphWidget2.setLabel('bottom', '<span style="color: white; font-size: 18px;">Tiempo (s)</span>')
         self.graphWidget2.setLabel('top', '<span style="color: white; font-size: 18px;">Giroscopio</span>')
-        #self.graphWidget2.setXRange(0, 30)
+        self.graphWidget2.getAxis('left').setStyle(tickFont=QFont('Trebuchet MS', 12))
+        self.graphWidget2.getAxis('bottom').setStyle(tickFont=QFont('Trebuchet MS', 12))
         
         # Configuración del gráfico de la Altura 
         self.graphWidget3 = pg.PlotWidget(self)
         self.graphWidget3.setGeometry(50, 550, 600, 200)
         self.graphWidget3.setBackground('black')
         self.graphWidget3.showGrid(x=True, y=True)
-        #self.graphWidget3.setXRange(0, 30)  # limite de Tiempo
-        self.graphWidget3.setYRange(0, 50)  # Limite de altura
 
         self.graphWidget3.setLabel('left', '<span style="color: white; font-size: 18px;">Altitud (metros)</span>')
-        self.graphWidget3.setLabel('bottom', '<span style="color: white; font-size: 18px;">Tiempo</span>')
+        self.graphWidget3.setLabel('bottom', '<span style="color: white; font-size: 18px;">Tiempo (s)</span>')
         self.graphWidget3.setLabel('top', '<span style="color: white; font-size: 18px;">Altura vs Tiempo</span>')
-       
+        self.graphWidget3.getAxis('left').setStyle(tickFont=QFont('Trebuchet MS', 12))
+        self.graphWidget3.getAxis('bottom').setStyle(tickFont=QFont('Trebuchet MS', 12))
         
         # Configuración del puerto serial
         self.ser = serial.Serial('COM4', 9600)
         self.ser.flush()
 
         # Variables para almacenar los datos
-        num_points = 100  # Número de puntos a mostrar en la gráfica
+        num_points = 1000  # Número de puntos a mostrar en la gráfica
         self.x_data = np.zeros(num_points)    ## Tiempo
         self.y_data_1 = np.zeros(num_points)  # AcX
         self.y_data_2 = np.zeros(num_points)  # AcY
@@ -67,6 +71,7 @@ class SerialPlot(QWidget):   ## Se declara una clase para el manejo del Widget
         self.y_data_5 = np.zeros(num_points)  # GyY
         self.y_data_6 = np.zeros(num_points)  # GyZ
         self.y_data_7 = np.zeros(num_points)  # Altura
+        self.start_time = time.time()
 
         # Crear las líneas para cada valor a graficar
         self.curve1 = self.graphWidget.plot(self.x_data, self.y_data_1, pen='r', name='AcX')
@@ -86,6 +91,45 @@ class SerialPlot(QWidget):   ## Se declara una clase para el manejo del Widget
         self.pos_2_0 = QLabel(self)
         self.pos_2_1 = QLabel(self)
         self.pos_2_2 = QLabel(self)
+        
+        # Crear widget adicional para la imagen
+        self.imageWidget = QLabel(self)
+        pixmap = QPixmap("TEL.jpg")  # Reemplaza con el nombre de tu imagen
+        pixmap = pixmap.scaled(60, 60)  # Ajustar el tamaño de la imagen a 200x200
+        self.imageWidget.setPixmap(pixmap)
+        self.imageWidget.setGeometry(550, 10, pixmap.width(), pixmap.height())
+        
+        # Crear widget adicional para la imagen
+        self.imageWidget2 = QLabel(self)
+        pixmap2 = QPixmap("LOGO_UMNG.jpg")  # Reemplaza con el nombre de tu imagen
+        pixmap2 = pixmap2.scaled(60, 60)  # Ajustar el tamaño de la imagen a 200x200
+        self.imageWidget2.setPixmap(pixmap2)
+        self.imageWidget2.setGeometry(480, 10, pixmap2.width(), pixmap2.height())
+
+        # Crear widget adicional para el botón "In progress"
+        self.buttonWidget = QPushButton("Stop", self)
+        self.buttonWidget.setGeometry(1680, 930, 200, 50)
+        self.buttonWidget.setStyleSheet('''
+            QPushButton {
+                padding: 10px 20px;
+                border: none;
+                font-size: 17px;
+                color: #fff;
+                border-radius: 7px;
+                letter-spacing: 4px;
+                font-weight: 700;
+                text-transform: uppercase;
+                background: rgb(0,140,255);
+                box-shadow: 0 0 25px rgb(0,140,255);
+            }
+            QPushButton:hover {
+                box-shadow: 0 0 5px rgb(0,140,255),
+                            0 0 25px rgb(0,140,255),
+                            0 0 50px rgb(0,140,255),
+                            0 0 100px rgb(0,140,255);
+            }
+        ''')
+        self.buttonWidget.clicked.connect(self.close_application)  # Conectar la señal clicked al slot close_application
 
         # Configuración de la matriz de layouts
         layout_matrix = QGridLayout()
@@ -99,20 +143,39 @@ class SerialPlot(QWidget):   ## Se declara una clase para el manejo del Widget
         layout_matrix.addWidget(self.graphWidget, 1, 0)  
         layout_matrix.addWidget(self.graphWidget2, 1, 1)  
         layout_matrix.addWidget(self.graphWidget3, 1, 2)  
-
+        layout_matrix.addWidget(self.pos_0_2, 0, 2)
+        
         # Configuración del diseño principal
         layout_main = QVBoxLayout()
         layout_main.addLayout(layout_matrix)
         self.setLayout(layout_main)
         
+        self.pos_0_0.setText("Universidad Militar Nueva Granada" + " \nPrograma de ingeniería en Telecomunicaciones")
+        self.pos_0_1.setText("Proyecto de telemetría"+ " Cohete: RocketDelta")
+        self.pos_2_1.setText("Muestras: 18 S/s "+"\nPotencia: 0 dBm "+ str(self.y_data_1[-1]))
+        self.pos_2_2.setText("Frecuencia: 2.510 GHz")
+        self.pos_0_0.setStyleSheet("font-size: 20px; font-weight: bold; font-family: Trebuchet MS;")
+        self.pos_2_0.setStyleSheet("font-size: 20px; font-weight: normal; font-family: Trebuchet MS;")
+        self.pos_0_1.setStyleSheet("font-size: 20px; font-weight: normal; font-family: Trebuchet MS;")
+        self.pos_2_1.setStyleSheet("font-size: 20px; font-weight: normal; font-family: Trebuchet MS;")
+        self.pos_0_2.setStyleSheet("font-size: 20px; font-weight: normal; font-family: Trebuchet MS;")
+        self.pos_2_2.setStyleSheet("font-size: 20px; font-weight: normal; font-family: Trebuchet MS;")
+        
+        self.pos_0_0.setGeometry(50, 50, 100, 200)
+        self.pos_2_0.setGeometry(50, 50, 100, 200)
+        
+        self.pos_0_1.setGeometry(50, 300, 100, 200)
+        self.pos_2_1.setGeometry(50, 300, 100, 200)
+        
+        self.pos_0_2.setGeometry(50, 550, 100, 200)
+        self.pos_2_2.setGeometry(50, 550, 100, 200)
+        
         # Configuración del temporizador para actualizar los datos
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_data)
-        self.timer.start(10)                #####    Número de muestras por segundo
-
-        # Llamar a la función update_datetime() para actualizar la hora
-        self.update_datetime()
-        
+        self.timer.start(1)                #####    Número de muestras por segundo
+        self.csv_header_written = False  # Inicializar la variable csv_header_written
+ 
     def update_data(self):
         # Leer los datos del puerto serie
         line = self.ser.readline().decode().strip()
@@ -136,20 +199,11 @@ class SerialPlot(QWidget):   ## Se declara una clase para el manejo del Widget
         self.y_data_7[:-1] = self.y_data_7[1:]
         self.y_data_7[-1] = float(values[6])
         # Crear valores para el tiempo
-        ##self.x_data[:-1] = self.x_data[1:]
-        ##self.x_data[-1] = self.x_data[-2] + 1
-        # Obtener el tiempo actual en segundos
-        current_time = time.time()
-
-        # Añadir los nuevos valores a los datos del tiempo
-        #self.x_data[:-1] = self.x_data[1:]
-        #self.x_data[-1] = current_time
-
-        # Crear valores para el tiempo en segundos
-        time_range = 30  # Escala de tiempo en segundos
-        time_step = time_range / len(self.x_data)
-        self.x_data = np.arange(0, time_range, time_step)
-
+        self.x_data[:-1] = self.x_data[1:]
+        #self.x_data[-1] = self.x_data[-2] + 1
+        elapsed_time = time.time() - self.start_time
+        self.x_data[-1] = elapsed_time
+        
         # Actualizar las líneas de la gráfica con los nuevos datos -> (Tiempo, Aceleración)
         self.curve1.setData(self.x_data, self.y_data_1)
         self.curve2.setData(self.x_data, self.y_data_2)
@@ -161,30 +215,17 @@ class SerialPlot(QWidget):   ## Se declara una clase para el manejo del Widget
         # Actualizar las líneas de la gráfica con los nuevos datos -> (Tiempo, Altura)
         self.curve7.setData(self.x_data, self.y_data_7)
 
-        # Actualizar las líneas de la gráfica con los nuevos datos -> (Tiempo, Aceleración)
-        self.curve1.setData(self.x_data, self.y_data_1)
-        self.curve2.setData(self.x_data, self.y_data_2)
-        self.curve3.setData(self.x_data, self.y_data_3)
-        # Actualizar las líneas de la gráfica con los nuevos datos -> (Tiempo, Giroscopio)
-        self.curve4.setData(self.x_data, self.y_data_4)
-        self.curve5.setData(self.x_data, self.y_data_5)
-        self.curve6.setData(self.x_data, self.y_data_6)
-        # Actualizar las líneas de la gráfica con los nuevos datos -> (Tiempo, Altura)
-        self.curve7.setData(self.x_data, self.y_data_7)
-        
-        
-         # Guardar los nuevos datos en el archivo CSV
-        #with open('datos.csv', 'a', newline='') as archivo_csv:
-            #escritor_csv = csv.writer(archivo_csv)
-            #escritor_csv.writerow([values[0], values[1], values[2], values[3], values[4], values[5], values[6]])
-    
-        # Guardar los datos en un archivo CSV
-        #data = list(zip(self.x_data, self.y_data_1, self.y_data_2, self.y_data_3, self.y_data_4, self.y_data_5, self.y_data_6, self.y_data_7))
-        #with open('datos.csv', 'w', newline='') as csvfile:
-            #writer = csv.writer(csvfile)
-           # writer.writerow(['T', 'AceX', 'AceY', 'AceZ', 'GirX', 'GirY', 'GirZ', 'H'])
-            #writer.writerows(data)
-    
+        # Guardar los nuevos datos en el archivo CSV
+        if not self.csv_header_written:
+            with open('Lanzamiento.csv', 'w', newline='') as archivo_csv:
+                escritor_csv = csv.writer(archivo_csv)
+                escritor_csv.writerow(['t (s)', 'AceX', 'AceY', 'AceZ', 'GirX', 'GirY', 'GirZ', 'Altura'])
+            self.csv_header_written = True
+
+        with open('Lanzamiento.csv', 'a', newline='') as archivo_csv:
+            escritor_csv = csv.writer(archivo_csv)
+            escritor_csv.writerow([self.x_data[-1], values[0], values[1], values[2], values[3], values[4], values[5], values[6]])
+                
     def update_datetime(self):
         # Obtener la fecha y hora actual
         now = datetime.datetime.now()
@@ -192,31 +233,16 @@ class SerialPlot(QWidget):   ## Se declara una clase para el manejo del Widget
         time_str = now.strftime("%H:%M:%S")
 
         # Actualizar las etiquetas de fecha y hora
-        self.pos_0_0.setText("Universidad Militar Nueva Granada" + " \nPrograma de ingeniería en Telecomunicaciones")
-        self.pos_0_1.setText("Proyecto de telemetría"+ " Cohete: RocketDelta")
         self.pos_2_0.setText("Fecha: " + date_str +" Hora: " + time_str)
-        self.pos_2_1.setText("Temperatura: "+"\nVelocidad: ")
-        self.pos_2_2.setText("Altura: ")
         
-        self.pos_0_0.setStyleSheet("font-size: 20px; font-weight: normal; font-style: trebuchet")
-        self.pos_2_0.setStyleSheet("font-size: 20px; font-weight: normal; font-style: trebuchet")
-        self.pos_0_1.setStyleSheet("font-size: 20px; font-weight: normal; font-style: trebuchet")
-        self.pos_2_1.setStyleSheet("font-size: 20px; font-weight: normal; font-style: trebuchet")
-        self.pos_0_2.setStyleSheet("font-size: 20px; font-weight: normal; font-style: trebuchet")
-        self.pos_2_2.setStyleSheet("font-size: 20px; font-weight: normal; font-style: trebuchet")
-        
-        self.pos_0_0.setGeometry(50, 50, 100, 200)
-        self.pos_2_0.setGeometry(50, 50, 100, 200)
-        
-        self.pos_0_1.setGeometry(50, 300, 100, 200)
-        self.pos_2_1.setGeometry(50, 300, 100, 200)
-        
-        self.pos_0_2.setGeometry(50, 550, 100, 200)
-        self.pos_2_2.setGeometry(50, 550, 100, 200)
+    def close_application(self):
+        qApp.quit()  # Cerrar la aplicación
         
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = SerialPlot()
     ex.show()
     ex.update_datetime()
-    sys.exit(app.exec_()) 
+    sys.exit(app.exec_())
+    
+

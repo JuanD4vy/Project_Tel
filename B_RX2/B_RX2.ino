@@ -16,7 +16,7 @@ void setup()
   radio.openReadingPipe(0, address);
   radio.setChannel(110);
   radio.setDataRate(RF24_250KBPS);
-  radio.setPALevel(RF24_PA_LOW);
+  radio.setPALevel(RF24_PA_MAX);
   radio.startListening();
   // Limpia el buffer del puerto serie
   Serial.flush();
