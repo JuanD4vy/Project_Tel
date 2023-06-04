@@ -245,6 +245,6 @@ if __name__ == '__main__':
     ex.update_datetime()
     sys.exit(app.exec_())
 
-
+print("HOLA")
     
 
