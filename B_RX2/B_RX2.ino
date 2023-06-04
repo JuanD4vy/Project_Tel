@@ -1,4 +1,4 @@
-// Código B_RX (BASE)
+// Código B_RX (Estación Base)
 
 #include <SPI.h>
 #include <RF24.h>
@@ -6,47 +6,38 @@
 RF24 radio(8, 53); // CE, CSN
 const byte address[6] = "00001";
 
-float AcX, AcY, AcZ, GyX, GyY, GyZ, ALTITUD;
+float datos[7] = {0}; // Arreglo para almacenar los datos
 
-void setup() 
+void setup()
 {
+  delay(1000);
   Serial.begin(9600);
   radio.begin();
   radio.openReadingPipe(0, address);
   radio.setChannel(110);
   radio.setDataRate(RF24_250KBPS);
-  radio.setPALevel(RF24_PA_MIN);
-  radio.startListening(); 
+  radio.setPALevel(RF24_PA_MAX);
+  radio.startListening();
+  // Limpia el buffer del puerto serie
+  Serial.flush();
 }
 
 void loop()
 {
-  if (radio.available())     
-  {  
-    float datos[7];
+  if (radio.available())
+  {
     radio.read(datos, sizeof(datos));
-    AcX = datos[0];
-    AcY = datos[1];
-    AcZ = datos[2];
-    GyX = datos[3];
-    GyY = datos[4];
-    GyZ = datos[5];
-    ALTITUD = datos[6];
 
-    Serial.print(AcX);
-    Serial.print(",");
-    Serial.print(AcY);
-    Serial.print(",");
-    Serial.print(AcZ);
-    Serial.print(",");
-    Serial.print(GyX);
-    Serial.print(",");
-    Serial.print(GyY);
-    Serial.print(",");
-    Serial.print(GyZ);
-    Serial.print(",");
-    Serial.println(ALTITUD);
-    
+    for (int i = 0; i < sizeof(datos) / sizeof(datos[0]); i++)
+    {
+      Serial.print(datos[i]);
+      if (i < sizeof(datos) / sizeof(datos[0]) - 1)
+      {
+        Serial.print(",");
+      }
+    }
+
+    Serial.println(); // Saltar a la siguiente línea después de imprimir todos los datos
   }
-  delay(50);
+  delay(10);
 }
